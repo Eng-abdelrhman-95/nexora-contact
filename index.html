@@ -3,53 +3,41 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Nexora - اتصل بنا</title>
+  <title>Nexora - روابط التواصل</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 <body>
-  <!-- عنصر طبقة الخلفية -->
-  <div class="bg-overlay"></div>
 
-  <div class="container">
-    <div class="contact-card">
-      <div class="header">
-        <img src="logo.jpg" alt="شعار نكسورا" class="logo">
-        <h1>اتصل بنا</h1>
-        <p>نحن هنا لمساعدتك والتواصل معك بكل حب</p>
-      </div>
+  <main class="page">
+    <div class="card">
+      <img src="logo.jpg" alt="Logo Nexora" class="logo">
+      
+      <h1>Nexora</h1>
+      <p class="description">مرحباً بك! يمكنك التواصل معنا بسهولة عبر جميع المنصات التالية:</p>
 
-      <form id="contactForm">
-        <div class="form-group">
-          <i class="fas fa-user icon"></i>
-          <input type="text" id="name" required placeholder="الاسم الكامل">
-        </div>
+      <div class="links-container">
+        <a href="https://wa.me/201021430931" class="link-btn whatsapp" target="_blank" rel="noopener">
+          واتساب (WhatsApp)
+        </a>
 
-        <div class="form-group">
-          <i class="fas fa-envelope icon"></i>
-          <input type="email" id="email" required placeholder="البريد الإلكتروني">
-        </div>
+        <a href="https://www.instagram.com/nexora_eg?igsh=MXR3ZWJqZ2N4cmpsNg==" class="link-btn instagram" target="_blank" rel="noopener">
+          إنستغرام (Instagram)
+        </a>
 
-        <div class="form-group">
-          <i class="fas fa-comment icon"></i>
-          <textarea id="message" rows="4" required placeholder="اكتب رسالتك هنا..."></textarea>
-        </div>
+        <a href="https://www.facebook.com/share/18eeL6q18n/" class="link-btn facebook" target="_blank" rel="noopener">
+          فيسبوك (Facebook)
+        </a>
 
-        <button type="submit" class="submit-btn">
-          <i class="fas fa-paper-plane"></i> إرسال الرسالة
-        </button>
-      </form>
+        <a href="https://www.tiktok.com/@nexora_eg?_t=ZS-8uX1Iip4uC6&_r=1" class="link-btn tiktok" target="_blank" rel="noopener">
+          تيك توك (TikTok)
+        </a>
 
-      <div class="social-links">
-        <p>أو تواصل معنا عبر منصات التواصل:</p>
-        <div class="icons">
-          <a href="#" class="social-icon"><i class="fab fa-facebook-f"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-twitter"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-instagram"></i></a>
-          <a href="#" class="social-icon"><i class="fab fa-linkedin-in"></i></a>
-        </div>
+        <a href="mailto:nexora.corp@gmail.com" class="link-btn email">
+          البريد الإلكتروني (Email)
+        </a>
       </div>
     </div>
-  </div>
+  </main>
+
 </body>
 </html>
