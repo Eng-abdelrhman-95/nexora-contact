@@ -1,7 +1,7 @@
 :root {
   --bg: #03050C;
-  --card-bg: rgba(10, 15, 29, 0.85);
-  --btn-bg: rgba(255, 255, 255, 0.03);
+  --card-bg: rgba(10, 15, 29, 0.82);
+  --btn-bg: rgba(255, 255, 255, 0.04);
   --btn-border: rgba(255, 255, 255, 0.08);
   --text-main: #E9EEF7;
   --text-muted: #8E9BAE;
@@ -14,7 +14,7 @@
 }
 
 html, body {
-  height: 100%;
+  min-height: 100vh;
   margin: 0;
   padding: 0;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
@@ -26,34 +26,63 @@ html, body {
   overflow-x: hidden;
 }
 
-/* حركة الخلفية الانسيابية */
-.bg-animated {
+/* =========================================
+   الخلفية المتحركة بكفاءة عالية (Pan & Zoom)
+   ========================================= */
+.bg-animated-wrapper {
   position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.bg-animated {
+  position: absolute;
   top: -10%;
   left: -10%;
   width: 120%;
   height: 120%;
-  background-image: 
-    radial-gradient(ellipse at 50% 10%, rgba(124, 58, 237, 0.15) 0%, rgba(3, 5, 12, 0.8) 60%),
-    url('background.jpg');
+  background-image: url('background.jpg');
   background-size: cover;
   background-position: center;
-  z-index: -1;
-  animation: bgMove 25s infinite alternate ease-in-out;
+  animation: continuousMotion 18s infinite alternate ease-in-out;
 }
 
-@keyframes bgMove {
-  0% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.06) translate(-10px, 15px); }
-  100% { transform: scale(1) translate(10px, -10px); }
+.bg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at 50% 20%, rgba(124, 58, 237, 0.25) 0%, rgba(3, 5, 12, 0.85) 75%);
+  pointer-events: none;
 }
 
+@keyframes continuousMotion {
+  0% {
+    transform: scale(1) translate(0, 0) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.12) translate(-20px, 15px) rotate(1deg);
+  }
+  100% {
+    transform: scale(1.05) translate(15px, -15px) rotate(-1deg);
+  }
+}
+
+/* =========================================
+   تنسيق الحاوية والكارت
+   ========================================= */
 .page {
   width: 100%;
   max-width: 480px;
   padding: 24px 12px;
   display: flex;
   justify-content: center;
+  z-index: 1;
 }
 
 .card {
@@ -61,21 +90,20 @@ html, body {
   background: var(--card-bg);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 20px;
   padding: 28px 20px;
   text-align: center;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.8);
 }
 
-/* الشعار والأناقة العلوية */
 .logo {
   width: 80px;
   height: 80px;
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid var(--purple-accent);
-  box-shadow: 0 0 18px rgba(124, 58, 237, 0.4);
+  box-shadow: 0 0 20px rgba(124, 58, 237, 0.5);
 }
 
 h1 {
@@ -113,7 +141,9 @@ h2 {
   margin: 0 0 20px 0;
 }
 
-/* الأزرار والروابط */
+/* =========================================
+   تنسيق الأزرار وتغير الألوان المخصص (Hover)
+   ========================================= */
 .links-container {
   display: flex;
   flex-direction: column;
@@ -126,31 +156,81 @@ h2 {
   justify-content: space-between;
   align-items: center;
   width: 100%;
-  padding: 12px 16px;
+  padding: 13px 18px;
   background: var(--btn-bg);
   border: 1px solid var(--btn-border);
   border-radius: 10px;
   color: var(--text-main);
   text-decoration: none;
   font-size: 0.88rem;
-  transition: all 0.25s ease;
+  font-weight: 500;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
+.link-btn i {
+  font-size: 1.1rem;
+  color: var(--purple-accent);
+  transition: color 0.3s ease;
+}
+
+/* تأثيرات التمرير بالألوان المخصصة لكل تطبيق */
 .link-btn:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.2);
-  transform: translateY(-2px);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
 }
 
-/* ألوان الأيقونات */
-.whatsapp-icon { color: #25D366; }
-.instagram-icon { color: #E1306C; }
-.facebook-icon { color: #1877F2; }
-.tiktok-icon { color: #FFFFFF; }
-.email-icon { color: #29B6FF; }
-.purple-icon { color: #8B5CF6; }
+.link-btn.whatsapp:hover {
+  background: #25D366;
+  border-color: #25D366;
+  color: #FFFFFF;
+}
 
-/* ألقاب الأقسام */
+.link-btn.whatsapp-catalog:hover {
+  background: #128C7E;
+  border-color: #128C7E;
+  color: #FFFFFF;
+}
+
+.link-btn.instagram:hover {
+  background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+  border-color: transparent;
+  color: #FFFFFF;
+}
+
+.link-btn.facebook:hover {
+  background: #1877F2;
+  border-color: #1877F2;
+  color: #FFFFFF;
+}
+
+.link-btn.tiktok:hover {
+  background: #000000;
+  border-color: #FE2C55;
+  box-shadow: -2px 2px 0px #25F4EE, 2px -2px 0px #FE2C55;
+  color: #FFFFFF;
+}
+
+.link-btn.email:hover {
+  background: linear-gradient(135deg, var(--cyan-accent), var(--purple-accent));
+  border-color: transparent;
+  color: #FFFFFF;
+}
+
+.link-btn.service-btn:hover,
+.link-btn.team-btn:hover,
+.link-btn.survey-btn:hover {
+  background: rgba(124, 58, 237, 0.25);
+  border-color: var(--purple-accent);
+  color: #FFFFFF;
+}
+
+.link-btn:hover i {
+  color: #FFFFFF;
+}
+
+/* =========================================
+   قسم طرق الدفع
+   ========================================= */
 .section-title {
   font-size: 0.8rem;
   font-weight: 700;
@@ -164,7 +244,6 @@ h2 {
   margin-bottom: 10px;
 }
 
-/* كروت طرق الدفع */
 .payment-container {
   display: flex;
   flex-direction: column;
@@ -216,17 +295,21 @@ h2 {
   background: rgba(41, 182, 255, 0.1);
   border: 1px solid rgba(41, 182, 255, 0.3);
   color: var(--cyan-accent);
-  padding: 4px 10px;
+  padding: 5px 12px;
   border-radius: 6px;
   font-size: 0.72rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.2s ease;
 }
 
 .copy-btn:hover {
   background: var(--cyan-accent);
   color: #000;
 }
+
+.cyan-icon { color: var(--cyan-accent); }
+.gray-icon { color: var(--text-muted); }
 
 .footer-text {
   font-size: 0.68rem;
