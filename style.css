@@ -23,7 +23,7 @@ body {
   font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   color: var(--near-white);
   background-color: var(--bg);
-  /* استخدام صورة الخلفية المرفقة background.jpg مع تدرج داكن لزيادة وضوح النصوص */
+  /* ربط صورة الخلفية المرفقة background.jpg مع طبقة تظليل خفيفة لإبراز الكارت والنصوص */
   background-image: 
     radial-gradient(ellipse at 50% 0%, rgba(5,7,15,0.35) 0%, rgba(5,7,15,0.78) 55%, rgba(5,7,15,0.94) 100%),
     url('background.jpg');
@@ -34,17 +34,6 @@ body {
   display: flex;
   justify-content: center;
   align-items: center;
-}
-
-/* طبقة الشفافية في حال استخدام عنصر .bg-overlay في الـ HTML */
-.bg-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.4);
-  z-index: -1;
 }
 
 /* حاوية الصفحة */
