@@ -22,7 +22,7 @@
       <button type="button" id="soundToggle" class="sound-btn" aria-label="تشغيل الصوت" aria-pressed="false" title="تشغيل / إيقاف الصوت">
         <i class="fas fa-volume-xmark" aria-hidden="true"></i>
       </button>
-      <audio id="ambientAudio" src="ambient.mp3" loop preload="none"></audio>
+      <audio id="ambientAudio" src="ambient.mp3" loop preload="auto" playsinline></audio>
       
       <!-- اللوجو والعناوين -->
       <div class="header-section">
@@ -36,7 +36,7 @@
         </p>
       </div>
 
-      <!-- قسم وسائل التواصل -->
+      <!-- قسم وسائل التواصل الأجتماعي -->
       <div class="section-title first-title">وسائل التواصل</div>
 
       <!-- روابط التواصل الرئيسي -->
@@ -178,13 +178,17 @@
       });
     }
 
-    // التحكم في الصوت الخلفي (تشغيل / إيقاف)
+    // الصوت الخلفي: محاولة تشغيل تلقائي، وإن منعها المتصفح يبدأ عند أول لمسة/ضغطة في أي مكان
     (function () {
       const audio = document.getElementById('ambientAudio');
       const btn = document.getElementById('soundToggle');
       const icon = btn.querySelector('i');
       const TARGET_VOLUME = 0.35;
+      const KEY = 'nexoraSoundOff';
       let fadeTimer = null;
+      let resumeAfterHidden = false;
+      let userMuted = false;
+      try { userMuted = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
 
       function fadeTo(target, done) {
         clearInterval(fadeTimer);
@@ -207,26 +211,64 @@
         icon.className = on ? 'fas fa-volume-high' : 'fas fa-volume-xmark';
       }
 
+      function remember(off) {
+        userMuted = off;
+        try { sessionStorage.setItem(KEY, off ? '1' : '0'); } catch (e) {}
+      }
+
+      function start() {
+        audio.volume = 0;
+        const p = audio.play();
+        if (p && typeof p.then === 'function') {
+          return p.then(() => { setUI(true); fadeTo(TARGET_VOLUME); return true; })
+                  .catch(() => { setUI(false); return false; });
+        }
+        setUI(true); fadeTo(TARGET_VOLUME);
+        return Promise.resolve(true);
+      }
+
+      function stop() {
+        setUI(false);
+        fadeTo(0, () => audio.pause());
+      }
+
+      // أحداث أول تفاعل للمستخدم (يُسمح بالصوت بعدها)
+      const GESTURES = ['pointerdown', 'touchend', 'click', 'keydown'];
+      function onFirstGesture(e) {
+        if (btn.contains(e.target)) return; // الزر له معالجه الخاص
+        if (userMuted || !audio.paused) { disarm(); return; }
+        start().then(ok => { if (ok) disarm(); });
+      }
+      function arm() { GESTURES.forEach(ev => document.addEventListener(ev, onFirstGesture, true)); }
+      function disarm() { GESTURES.forEach(ev => document.removeEventListener(ev, onFirstGesture, true)); }
+
+      // الزر: تشغيل / كتم يدوي
       btn.addEventListener('click', () => {
         if (audio.paused) {
-          audio.volume = 0;
-          audio.play().then(() => {
-            setUI(true);
-            fadeTo(TARGET_VOLUME);
-          }).catch(() => setUI(false));
+          remember(false);
+          disarm();
+          start();
         } else {
-          setUI(false);
-          fadeTo(0, () => audio.pause());
+          remember(true);
+          disarm();
+          stop();
         }
       });
 
-      // إيقاف مؤقت عند مغادرة التبويب
+      // إيقاف عند مغادرة التبويب واستئناف عند العودة
       document.addEventListener('visibilitychange', () => {
-        if (document.hidden && !audio.paused) {
-          audio.pause();
-          setUI(false);
+        if (document.hidden) {
+          if (!audio.paused) { resumeAfterHidden = true; audio.pause(); }
+        } else if (resumeAfterHidden && !userMuted) {
+          resumeAfterHidden = false;
+          start();
         }
       });
+
+      // البداية: محاولة تشغيل تلقائي، وإن فشلت ننتظر أول تفاعل
+      if (!userMuted) {
+        start().then(ok => { if (!ok) arm(); });
+      }
     })();
   </script>
 </body>
