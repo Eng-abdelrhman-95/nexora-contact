@@ -9,7 +9,6 @@
 </head>
 <body>
 
-  
   <!-- طبقة تحريك الخلفية -->
   <div class="bg-animated-wrapper">
     <div class="bg-animated"></div>
@@ -247,9 +246,9 @@
       }
 
       // ===== التفاعل الأول =====
-      // أحداث تمنح المتصفح "إذن الصوت" فعلياً: pointerup / touchend / click / keydown
+      // أحداث تمنح المتصفح "إذن الصوت" فعلياً: pointerdown (ماوس) / pointerup / touchend / click / keydown
       // أحداث محاولة فقط (قد يرفضها المتصفح): touchstart / scroll / wheel
-      const UNLOCKING = ['pointerup', 'touchend', 'click', 'keydown'];
+      const UNLOCKING = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
       const BEST_EFFORT = ['touchstart', 'scroll', 'wheel'];
 
       function onInteract(e) {
