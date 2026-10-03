@@ -109,11 +109,11 @@
       <!-- قسم العملاء الحاليين -->
       <div class="section-title">NEXORA | Existing Clients للعملاء الحاليين</div>
       <div class="links-container">
-        <a href="https://forms.gle/k7gXbq7NJe5Gvf1k8" class="link-btn survey-btn" target="_blank" rel="noopener noreferrer">
+        <a href="https://forms.gle/U6oC2ysbvqqLsV7t8" class="link-btn survey-btn" target="_blank" rel="noopener noreferrer">
           <span>استبيان رضا العملاء (عربي)</span>
           <i class="fas fa-poll"></i>
         </a>
-        <a href="https://forms.gle/PjzKnntAGUA5PrCQ6" class="link-btn survey-btn" target="_blank" rel="noopener noreferrer">
+        <a href="https://forms.gle/HxKG9BhAXZZZa7eV9" class="link-btn survey-btn" target="_blank" rel="noopener noreferrer">
           <span>Customer Satisfaction Survey (EN)</span>
           <i class="fas fa-poll"></i>
         </a>
@@ -185,6 +185,8 @@
     }
 
     // الصوت الخلفي
+    // 1) محاولة تشغيل بصوت فور فتح الصفحة.
+    // 2) إن منع المتصفح ذلك: يبدأ الصوت صامتاً (مسموح)، ويُفكّ الكتم تلقائياً عند أول تفاعل.
     (function () {
       const audio = document.getElementById('ambientAudio');
       const btn = document.getElementById('soundToggle');
@@ -199,8 +201,21 @@
 
       const isOn = () => !audio.paused && !audio.muted;
 
+      // iOS Safari: خاصية audio.volume للقراءة فقط (دائماً 1) ويتجاهل Safari أي تعيين لها،
+      // لذلك لا يمكن التلاشي بالـ volume. نكتشف ذلك مرة واحدة، وعندها تُنفَّذ الإجراءات (pause) فوراً.
+      const volumeSettable = (function () {
+        try {
+          const v = audio.volume;
+          audio.volume = v === 1 ? 0.5 : 1;
+          const ok = audio.volume !== v;
+          audio.volume = v;
+          return ok;
+        } catch (e) { return false; }
+      })();
+
       function fadeTo(target, done) {
         clearInterval(fadeTimer);
+        if (!volumeSettable) { if (done) done(); return; } // iOS: بدون تلاشي، pause() مباشرة
         fadeTimer = setInterval(() => {
           const diff = target - audio.volume;
           if (Math.abs(diff) < 0.03) {
@@ -225,6 +240,7 @@
         try { sessionStorage.setItem(KEY, off ? '1' : '0'); } catch (e) {}
       }
 
+      // تشغيل بصوت. عند المنع: تشغيل صامت كاحتياط ثم ننتظر أول تفاعل
       function start() {
         audio.muted = false;
         audio.volume = 0;
@@ -248,11 +264,15 @@
         fadeTo(0, () => audio.pause());
       }
 
+      // ===== التفاعل الأول =====
+      // المستمعات passive وبدون capture، ولا تمنع السلوك الافتراضي للروابط إطلاقاً
+      // أحداث تمنح المتصفح "إذن الصوت" فعلياً: pointerdown (ماوس) / pointerup / touchend / click / keydown
+      // أحداث محاولة فقط (قد يرفضها المتصفح): touchstart / scroll / wheel
       const UNLOCKING = ['pointerdown', 'pointerup', 'touchend', 'click', 'keydown'];
       const BEST_EFFORT = ['touchstart', 'scroll', 'wheel'];
 
       function onInteract(e) {
-        if (e.target && e.target.nodeType === 1 && btn.contains(e.target)) return;
+        if (e.target && e.target.nodeType === 1 && btn.contains(e.target)) return; // للزر معالج خاص
         if (userMuted) { disarm(); return; }
         if (isOn()) { disarm(); return; }
         if (busy) return;
@@ -268,6 +288,7 @@
         BEST_EFFORT.forEach(ev => window.removeEventListener(ev, onInteract));
       }
 
+      // الزر: تشغيل / كتم يدوي
       btn.addEventListener('click', () => {
         if (isOn()) {
           remember(true); disarm(); stop();
@@ -276,6 +297,7 @@
         }
       });
 
+      // إيقاف عند مغادرة التبويب واستئناف عند العودة
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
           if (isOn()) { resumeAfterHidden = true; audio.pause(); setUI(false); }
@@ -285,6 +307,7 @@
         }
       });
 
+      // البداية
       if (!userMuted) {
         start().then(ok => { if (!ok) arm(); });
       }
