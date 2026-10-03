@@ -199,7 +199,9 @@
       let userMuted = false;
       try { userMuted = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
 
-      const isOn = () => !audio.paused && !audio.muted;
+      let ctx = null;   // AudioContext  (iOS فقط)
+      let gain = null;  // GainNode       (iOS فقط)
+      const isOn = () => !audio.paused && !audio.muted && (!ctx || ctx.state === 'running');
 
       // iOS Safari: خاصية audio.volume للقراءة فقط (دائماً 1) ويتجاهل Safari أي تعيين لها،
       // لذلك لا يمكن التلاشي بالـ volume. نكتشف ذلك مرة واحدة، وعندها تُنفَّذ الإجراءات (pause) فوراً.
@@ -228,6 +230,46 @@
         }, 40);
       }
 
+      // ===== iOS: التحكم بالصوت عبر Web Audio (AudioContext + GainNode) =====
+      // أجهزة أندرويد/الكمبيوتر تبقى على المسار المباشر (audio.muted / audio.volume) ولا تُنشئ AudioContext أبداً.
+      const IOS = /iP(hone|ad|od)/.test(navigator.userAgent) ||
+                  (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1); // iPadOS
+      const useGain = IOS || !volumeSettable;
+
+      // يُستدعى داخل لمسة المستخدم فقط (شرط iOS لتفعيل AudioContext)
+      function ensureGraph() {
+        if (!useGain || ctx) return;
+        try {
+          const AC = window.AudioContext || window.webkitAudioContext;
+          const c = new AC();
+          const track = c.createMediaElementSource(audio);
+          const g = c.createGain();
+          track.connect(g).connect(c.destination);
+          ctx = c; gain = g;
+        } catch (e) { ctx = null; gain = null; }
+      }
+
+      // كتم تام فوري عبر GainNode
+      function muteGain() {
+        if (!gain) return;
+        try {
+          const t = ctx.currentTime;
+          gain.gain.cancelScheduledValues(t);
+          gain.gain.setValueAtTime(0, t);
+        } catch (e) { try { gain.gain.value = 0; } catch (_) {} }
+      }
+
+      // رفع الصوت تدريجياً (بديل fade الـ volume غير المدعوم على iOS)
+      function rampGain(v) {
+        if (!gain) return;
+        try {
+          const t = ctx.currentTime;
+          gain.gain.cancelScheduledValues(t);
+          gain.gain.setValueAtTime(0, t);
+          gain.gain.linearRampToValueAtTime(v, t + 0.8);
+        } catch (e) { try { gain.gain.value = v; } catch (_) {} }
+      }
+
       function setUI(on) {
         btn.classList.toggle('is-playing', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
@@ -241,14 +283,21 @@
       }
 
       // تشغيل بصوت. عند المنع: تشغيل صامت كاحتياط ثم ننتظر أول تفاعل
-      function start() {
+      // fromGesture: true عند استدعائها من لمسة/ضغطة حقيقية (مطلوب لتفعيل AudioContext على iOS)
+      function start(fromGesture) {
+        if (fromGesture) ensureGraph();
         audio.muted = false;
-        audio.volume = 0;
+        if (gain) muteGain(); else audio.volume = 0;       // نبدأ من الصمت ثم نرفع تدريجياً
         let p;
         try { p = audio.play(); } catch (e) { p = Promise.reject(e); }
-        return Promise.resolve(p).then(() => {
+        // على iOS: resume() يجب أن يُستدعى بشكل متزامن داخل نفس اللمسة
+        const resumed = (ctx && ctx.state !== 'running') ? ctx.resume().catch(() => {}) : null;
+        return Promise.resolve(p).then(() => resumed).then(() => {
+          if (ctx && ctx.state !== 'running') {              // iOS رفض تفعيل الصوت: ننتظر لمسة أخرى
+            audio.pause(); setUI(false); return false;
+          }
           setUI(true);
-          fadeTo(TARGET_VOLUME);
+          if (gain) rampGain(TARGET_VOLUME); else fadeTo(TARGET_VOLUME);
           return true;
         }).catch(() => {
           audio.muted = true;
@@ -261,7 +310,8 @@
 
       function stop() {
         setUI(false);
-        fadeTo(0, () => audio.pause());
+        if (gain) muteGain();                    // iOS: كتم تام عبر GainNode
+        fadeTo(0, () => audio.pause());          // + إيقاف العنصر (على iOS فوراً بدون تلاشي)
       }
 
       // ===== التفاعل الأول =====
@@ -275,9 +325,12 @@
         if (e.target && e.target.nodeType === 1 && btn.contains(e.target)) return; // للزر معالج خاص
         if (userMuted) { disarm(); return; }
         if (isOn()) { disarm(); return; }
+        // pointerdown/touchstart/scroll/wheel لا تُعدّ لمسة تفعيل للصوت على iOS
+        const fromGesture = !['pointerdown', 'touchstart', 'scroll', 'wheel'].includes(e.type);
+        if (useGain && !fromGesture) return;   // iOS: ننتظر لمسة حقيقية (touchend/click) لإنشاء AudioContext وتشغيله
         if (busy) return;
         busy = true;
-        start().then(ok => { busy = false; if (ok) disarm(); });
+        start(fromGesture).then(ok => { busy = false; if (ok) disarm(); });
       }
       function arm() {
         UNLOCKING.forEach(ev => document.addEventListener(ev, onInteract, { passive: true }));
@@ -293,7 +346,7 @@
         if (isOn()) {
           remember(true); disarm(); stop();
         } else {
-          remember(false); disarm(); start();
+          remember(false); disarm(); start(true);
         }
       });
 
