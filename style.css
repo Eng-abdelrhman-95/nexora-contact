@@ -406,6 +406,7 @@ h2 {
   box-shadow: 0 0 14px rgba(41, 182, 255, 0.45);
 }
 
+
 .sound-btn.is-playing {
   color: #FFFFFF;
   background: linear-gradient(135deg, var(--cyan-accent), var(--purple-accent));
