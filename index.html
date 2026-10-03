@@ -36,85 +36,85 @@
         </p>
       </div>
 
-      <!-- قسم وسائل التواصل الأجتماعي -->
-      <div class="section-title first-title">وسائل التواصل</div>
+      <!-- قسم وسائل التواصل -->
+      <div class="section-title first-title">NEXORA | Contact Us وسائل التواصل</div>
 
       <!-- روابط التواصل الرئيسي -->
       <div class="links-container">
         <a href="https://wa.me/201021430931" class="link-btn whatsapp" target="_blank" rel="noopener">
-          <span>WhatsApp</span>
+          <span>WhatsApp | واتساب</span>
           <i class="fab fa-whatsapp"></i>
         </a>
 
         <a href="https://wa.me/201021430931" class="link-btn whatsapp-catalog" target="_blank" rel="noopener">
-          <span>WhatsApp Business Catalog</span>
+          <span>WhatsApp Business Catalog | كتالوج الأعمال</span>
           <i class="fas fa-store"></i>
         </a>
 
         <a href="https://www.instagram.com/nexora_eg?igsh=MXR3ZWJqZ2N4cmpsNg==" class="link-btn instagram" target="_blank" rel="noopener">
-          <span>Instagram</span>
+          <span>Instagram | إنستغرام</span>
           <i class="fab fa-instagram"></i>
         </a>
 
         <a href="https://www.facebook.com/share/18eeL6q18n/" class="link-btn facebook" target="_blank" rel="noopener">
-          <span>Facebook</span>
+          <span>Facebook | فيسبوك</span>
           <i class="fab fa-facebook-f"></i>
         </a>
 
         <a href="https://www.tiktok.com/@nexora_eg?_t=ZS-8uX1Iip4uC6&_r=1" class="link-btn tiktok" target="_blank" rel="noopener">
-          <span>TikTok</span>
+          <span>TikTok | تيك توك</span>
           <i class="fab fa-tiktok"></i>
         </a>
 
         <a href="mailto:nexora.corp@gmail.com" class="link-btn email">
-          <span>Email</span>
+          <span>Email | البريد الإلكتروني</span>
           <i class="fas fa-envelope"></i>
         </a>
       </div>
 
       <!-- قسم خدمات NEXORA -->
-      <div class="section-title">NEXORA | NEXORA Services خدمات</div>
+      <div class="section-title">NEXORA | NEXORA Services خدمات نكسورا</div>
       <p class="section-sub">طلب خدمات الأعمال</p>
       
       <div class="links-container">
         <a href="#" class="link-btn service-btn">
-          <span>طلب خدمات الأعمال – عربي</span>
+          <span>طلب خدمات الأعمال (عربي)</span>
           <i class="fas fa-file-alt"></i>
         </a>
         <a href="#" class="link-btn service-btn">
-          <span>Business Services Request – English</span>
+          <span>Business Services Request (EN)</span>
           <i class="fas fa-file-alt"></i>
         </a>
       </div>
 
       <!-- قسم التوظيف -->
-      <div class="section-title">NEXORA | Join NEXORA Team انضم إلى فريق</div>
+      <div class="section-title">NEXORA | Join NEXORA Team انضم إلى فريق نكسورا</div>
       <div class="links-container">
         <a href="#" class="link-btn team-btn">
-          <span>التوظيف – عربي</span>
+          <span>استمارة التوظيف (عربي)</span>
           <i class="fas fa-user-tie"></i>
         </a>
         <a href="#" class="link-btn team-btn">
-          <span>Employment – English</span>
+          <span>Employment Application (EN)</span>
           <i class="fas fa-user-tie"></i>
         </a>
       </div>
 
       <!-- قسم العملاء الحاليين -->
-      <div class="section-title">Existing Clients | للعملاء الحاليين</div>
+      <div class="section-title">NEXORA | Existing Clients للعملاء الحاليين</div>
       <div class="links-container">
         <a href="#" class="link-btn survey-btn">
-          <span>استبيان رضا العملاء – عربي</span>
+          <span>استبيان رضا العملاء (عربي)</span>
           <i class="fas fa-poll"></i>
         </a>
         <a href="#" class="link-btn survey-btn">
-          <span>Customer Satisfaction Survey – English</span>
+          <span>Customer Satisfaction Survey (EN)</span>
           <i class="fas fa-poll"></i>
         </a>
       </div>
 
       <!-- قسم طرق الدفع -->
-      <div class="section-title">طرق الدفع</div>
+      <div class="section-title">NEXORA | Payment Methods طرق الدفع</div>
       <div class="payment-container">
         
         <!-- Vodafone Cash -->
@@ -178,7 +178,9 @@
       });
     }
 
-    // الصوت الخلفي: محاولة تشغيل تلقائي، وإن منعها المتصفح يبدأ عند أول لمسة/ضغطة في أي مكان
+    // الصوت الخلفي
+    // 1) محاولة تشغيل بصوت فور فتح الصفحة.
+    // 2) إن منع المتصفح ذلك: يبدأ الصوت صامتاً (مسموح)، ويُفكّ الكتم تلقائياً عند أول تفاعل.
     (function () {
       const audio = document.getElementById('ambientAudio');
       const btn = document.getElementById('soundToggle');
@@ -187,8 +189,11 @@
       const KEY = 'nexoraSoundOff';
       let fadeTimer = null;
       let resumeAfterHidden = false;
+      let busy = false;
       let userMuted = false;
       try { userMuted = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+
+      const isOn = () => !audio.paused && !audio.muted;
 
       function fadeTo(target, done) {
         clearInterval(fadeTimer);
@@ -216,15 +221,23 @@
         try { sessionStorage.setItem(KEY, off ? '1' : '0'); } catch (e) {}
       }
 
+      // تشغيل بصوت. عند المنع: تشغيل صامت كاحتياط ثم ننتظر أول تفاعل
       function start() {
+        audio.muted = false;
         audio.volume = 0;
-        const p = audio.play();
-        if (p && typeof p.then === 'function') {
-          return p.then(() => { setUI(true); fadeTo(TARGET_VOLUME); return true; })
-                  .catch(() => { setUI(false); return false; });
-        }
-        setUI(true); fadeTo(TARGET_VOLUME);
-        return Promise.resolve(true);
+        let p;
+        try { p = audio.play(); } catch (e) { p = Promise.reject(e); }
+        return Promise.resolve(p).then(() => {
+          setUI(true);
+          fadeTo(TARGET_VOLUME);
+          return true;
+        }).catch(() => {
+          audio.muted = true;
+          const q = audio.play();
+          if (q && q.catch) q.catch(() => {});
+          setUI(false);
+          return false;
+        });
       }
 
       function stop() {
@@ -232,40 +245,49 @@
         fadeTo(0, () => audio.pause());
       }
 
-      // أحداث أول تفاعل للمستخدم (يُسمح بالصوت بعدها)
-      const GESTURES = ['pointerdown', 'touchend', 'click', 'keydown'];
-      function onFirstGesture(e) {
-        if (btn.contains(e.target)) return; // الزر له معالجه الخاص
-        if (userMuted || !audio.paused) { disarm(); return; }
-        start().then(ok => { if (ok) disarm(); });
+      // ===== التفاعل الأول =====
+      // أحداث تمنح المتصفح "إذن الصوت" فعلياً: pointerup / touchend / click / keydown
+      // أحداث محاولة فقط (قد يرفضها المتصفح): touchstart / scroll / wheel
+      const UNLOCKING = ['pointerup', 'touchend', 'click', 'keydown'];
+      const BEST_EFFORT = ['touchstart', 'scroll', 'wheel'];
+
+      function onInteract(e) {
+        if (e.target && e.target.nodeType === 1 && btn.contains(e.target)) return; // للزر معالج خاص
+        if (userMuted) { disarm(); return; }
+        if (isOn()) { disarm(); return; }
+        if (busy) return;
+        busy = true;
+        start().then(ok => { busy = false; if (ok) disarm(); });
       }
-      function arm() { GESTURES.forEach(ev => document.addEventListener(ev, onFirstGesture, true)); }
-      function disarm() { GESTURES.forEach(ev => document.removeEventListener(ev, onFirstGesture, true)); }
+      function arm() {
+        UNLOCKING.forEach(ev => document.addEventListener(ev, onInteract, true));
+        BEST_EFFORT.forEach(ev => window.addEventListener(ev, onInteract, { capture: true, passive: true }));
+      }
+      function disarm() {
+        UNLOCKING.forEach(ev => document.removeEventListener(ev, onInteract, true));
+        BEST_EFFORT.forEach(ev => window.removeEventListener(ev, onInteract, true));
+      }
 
       // الزر: تشغيل / كتم يدوي
       btn.addEventListener('click', () => {
-        if (audio.paused) {
-          remember(false);
-          disarm();
-          start();
+        if (isOn()) {
+          remember(true); disarm(); stop();
         } else {
-          remember(true);
-          disarm();
-          stop();
+          remember(false); disarm(); start();
         }
       });
 
       // إيقاف عند مغادرة التبويب واستئناف عند العودة
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-          if (!audio.paused) { resumeAfterHidden = true; audio.pause(); }
+          if (isOn()) { resumeAfterHidden = true; audio.pause(); setUI(false); }
         } else if (resumeAfterHidden && !userMuted) {
           resumeAfterHidden = false;
-          start();
+          start().then(ok => { if (!ok) arm(); });
         }
       });
 
-      // البداية: محاولة تشغيل تلقائي، وإن فشلت ننتظر أول تفاعل
+      // البداية
       if (!userMuted) {
         start().then(ok => { if (!ok) arm(); });
       }
