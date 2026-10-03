@@ -460,3 +460,123 @@ h2 {
 @media (prefers-reduced-motion: reduce) {
   .sound-btn.is-playing { animation: none; }
 }
+
+/* =========================================
+   شاشة الدخول (Splash)
+   ========================================= */
+html.splash-open,
+html.splash-open body {
+  overflow: hidden;
+}
+
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(3, 5, 12, 0.55);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.6s ease, visibility 0s linear 0s;
+}
+
+.splash.is-hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.6s ease, visibility 0s linear 0.6s;
+}
+
+.splash-inner {
+  width: 100%;
+  max-width: 340px;
+  text-align: center;
+  padding: 32px 22px;
+  background: var(--card-bg);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 20px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.55);
+  animation: splashIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes splashIn {
+  from { opacity: 0; transform: translateY(14px) scale(0.97); }
+  to   { opacity: 1; transform: none; }
+}
+
+.splash-logo {
+  width: 92px;
+  height: 92px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--purple-accent);
+  box-shadow: 0 0 26px rgba(124, 58, 237, 0.6);
+}
+
+.splash-name {
+  margin-top: 14px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.splash-name-ar {
+  font-size: 1rem;
+  color: var(--text-muted);
+}
+
+.splash-divider {
+  width: 40px;
+  height: 2px;
+  margin: 12px auto 14px;
+  background: var(--purple-accent);
+  border-radius: 2px;
+}
+
+.splash-text {
+  margin: 0 0 20px;
+  font-size: 0.85rem;
+  color: var(--cyan-accent);
+  font-weight: 600;
+}
+
+.splash-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 18px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--cyan-accent), var(--purple-accent));
+  color: #FFFFFF;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: 0 0 22px rgba(124, 58, 237, 0.55);
+  animation: splashPulse 2.4s ease-in-out infinite;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.splash-btn:hover,
+.splash-btn:focus-visible {
+  outline: none;
+  transform: translateY(-3px);
+}
+
+.splash-btn:active {
+  transform: scale(0.98);
+}
+
+@keyframes splashPulse {
+  0%, 100% { box-shadow: 0 0 16px rgba(124, 58, 237, 0.50); }
+  50%      { box-shadow: 0 0 30px rgba(41, 182, 255, 0.70); }
+}
