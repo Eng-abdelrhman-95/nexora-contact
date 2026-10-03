@@ -80,7 +80,7 @@
 
       <!-- قسم خدمات NEXORA -->
       <div class="section-title">NEXORA | NEXORA Services خدمات نكسورا</div>
-      <p class="section-sub">طلب خدمات الأعمال</p>
+      <p class="section-sub">طلب خدمات الأعمال للعملاء الجدد | Business Services Request (For New Clients)</p>
       
       <div class="links-container">
         <a href="https://forms.gle/GaMr4L5Z96SvLYoc8" class="link-btn service-btn" target="_blank" rel="noopener noreferrer">
@@ -95,6 +95,7 @@
 
       <!-- قسم التوظيف -->
       <div class="section-title">NEXORA | Join NEXORA Team انضم إلى فريق نكسورا</div>
+      <p class="section-sub">تقديم طلبات الانضمام والتوظيف | Job & Career Applications</p>
       <div class="links-container">
         <a href="https://forms.gle/xY7KocNC1wuhCnLU8" class="link-btn team-btn" target="_blank" rel="noopener noreferrer">
           <span>استمارة التوظيف (عربي)</span>
@@ -108,6 +109,7 @@
 
       <!-- قسم العملاء الحاليين -->
       <div class="section-title">NEXORA | Existing Clients للعملاء الحاليين</div>
+      <p class="section-sub">تقييم الخدمات واستبيانات الرأي | Service Evaluation & Feedback</p>
       <div class="links-container">
         <a href="https://forms.gle/U6oC2ysbvqqLsV7t8" class="link-btn survey-btn" target="_blank" rel="noopener noreferrer">
           <span>استبيان رضا العملاء (عربي)</span>
@@ -192,15 +194,16 @@
       const btn = document.getElementById('soundToggle');
       const icon = btn.querySelector('i');
       const TARGET_VOLUME = 0.35;
-      const KEY = 'nexoraSoundOff';
       let fadeTimer = null;
       let resumeAfterHidden = false;
       let busy = false;
       let userMuted = false;
-      try { userMuted = sessionStorage.getItem(KEY) === '1'; } catch (e) {}
+      let soundOn = false;   // حالة الزر الفعلية (تطابق الأيقونة). الزر يفعل دائماً عكس ما تعرضه الأيقونة
+      // الكتم اليدوي يسري على الصفحة الحالية فقط (لا يُحفظ بين مرات التحميل/التحديث)،
+      // فكل زيارة أو تحديث للصفحة يبدأ الصوت فيها بأول ضغطة في أي مكان أو على أي زر.
 
       let ctx = null;   // AudioContext  (iOS فقط)
-      let gain = null;  // GainNode       (iOS فقط)
+      let gain = null;  // GainNode        (iOS فقط)
       const isOn = () => !audio.paused && !audio.muted && (!ctx || ctx.state === 'running');
 
       // iOS Safari: خاصية audio.volume للقراءة فقط (دائماً 1) ويتجاهل Safari أي تعيين لها،
@@ -271,6 +274,7 @@
       }
 
       function setUI(on) {
+        soundOn = on;
         btn.classList.toggle('is-playing', on);
         btn.setAttribute('aria-pressed', on ? 'true' : 'false');
         btn.setAttribute('aria-label', on ? 'إيقاف الصوت' : 'تشغيل الصوت');
@@ -279,7 +283,6 @@
 
       function remember(off) {
         userMuted = off;
-        try { sessionStorage.setItem(KEY, off ? '1' : '0'); } catch (e) {}
       }
 
       // تشغيل بصوت. عند المنع: تشغيل صامت كاحتياط ثم ننتظر أول تفاعل
@@ -291,7 +294,9 @@
         let p;
         try { p = audio.play(); } catch (e) { p = Promise.reject(e); }
         // على iOS: resume() يجب أن يُستدعى بشكل متزامن داخل نفس اللمسة
-        const resumed = (ctx && ctx.state !== 'running') ? ctx.resume().catch(() => {}) : null;
+        const resumed = (ctx && ctx.state !== 'running')
+          ? Promise.race([ctx.resume().catch(() => {}), new Promise(r => setTimeout(r, 1500))])
+          : null;
         return Promise.resolve(p).then(() => resumed).then(() => {
           if (ctx && ctx.state !== 'running') {              // iOS رفض تفعيل الصوت: ننتظر لمسة أخرى
             audio.pause(); setUI(false); return false;
@@ -310,8 +315,16 @@
 
       function stop() {
         setUI(false);
-        if (gain) muteGain();                    // iOS: كتم تام عبر GainNode
-        fadeTo(0, () => audio.pause());          // + إيقاف العنصر (على iOS فوراً بدون تلاشي)
+        if (useGain) {
+          // iOS: كتم قاطع بعدة طبقات معاً، لا يعتمد على أي حالة أو وعد (Promise)
+          clearInterval(fadeTimer);
+          muteGain();                                              // 1) GainNode = 0
+          try { audio.muted = true; } catch (e) {}                 // 2) كتم العنصر
+          audio.pause();                                           // 3) إيقاف العنصر
+          if (ctx) { try { ctx.suspend().catch(() => {}); } catch (e) {} } // 4) إيقاف AudioContext بالكامل
+          return;
+        }
+        fadeTo(0, () => audio.pause());          // أندرويد/الكمبيوتر: تلاشي ثم إيقاف (كما هو)
       }
 
       // ===== التفاعل الأول =====
@@ -343,7 +356,7 @@
 
       // الزر: تشغيل / كتم يدوي
       btn.addEventListener('click', () => {
-        if (isOn()) {
+        if (soundOn) {
           remember(true); disarm(); stop();
         } else {
           remember(false); disarm(); start(true);
@@ -353,7 +366,7 @@
       // إيقاف عند مغادرة التبويب واستئناف عند العودة
       document.addEventListener('visibilitychange', () => {
         if (document.hidden) {
-          if (isOn()) { resumeAfterHidden = true; audio.pause(); setUI(false); }
+          if (soundOn) { resumeAfterHidden = true; audio.pause(); setUI(false); }
         } else if (resumeAfterHidden && !userMuted) {
           resumeAfterHidden = false;
           start().then(ok => { if (!ok) arm(); });
