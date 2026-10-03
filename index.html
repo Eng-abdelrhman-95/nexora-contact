@@ -1,13 +1,29 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl" class="splash-open">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NEXORA - نكسورا</title>
   <link rel="stylesheet" href="style.css">
+  <noscript><style>.splash{display:none !important}html.splash-open,html.splash-open body{overflow:auto !important}</style></noscript>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+
+  <!-- شاشة الدخول: تضمن تشغيل الصوت بعد أول ضغطة (قيد المتصفحات على التشغيل التلقائي) -->
+  <div class="splash" id="splash" role="dialog" aria-modal="true" aria-label="شاشة الدخول">
+    <div class="splash-inner">
+      <img src="logo.jpg" alt="Nexora Logo" class="splash-logo">
+      <div class="splash-name">NEXORA</div>
+      <div class="splash-name-ar">نكسورا</div>
+      <div class="splash-divider"></div>
+      <p class="splash-text">مرحباً بك · Welcome</p>
+      <button type="button" id="enterBtn" class="splash-btn">
+        <span>دخول الموقع | Enter Website</span>
+        <i class="fas fa-arrow-left" aria-hidden="true"></i>
+      </button>
+    </div>
+  </div>
 
   <!-- طبقة تحريك الخلفية -->
   <div class="bg-animated-wrapper">
@@ -185,6 +201,8 @@
       const audio = document.getElementById('ambientAudio');
       const btn = document.getElementById('soundToggle');
       const icon = btn.querySelector('i');
+      const splash = document.getElementById('splash');
+      const enterBtn = document.getElementById('enterBtn');
       const TARGET_VOLUME = 0.35;
       const KEY = 'nexoraSoundOff';
       let fadeTimer = null;
@@ -252,46 +270,6 @@
       const BEST_EFFORT = ['touchstart', 'scroll', 'wheel'];
 
       function onInteract(e) {
-        if (e.target && e.target.nodeType === 1 && btn.contains(e.target)) return; // للزر معالج خاص
+        if (e.target && e.target.nodeType === 1 && (btn.contains(e.target) || splash.contains(e.target))) return; // للزر وشاشة الدخول معالج خاص
         if (userMuted) { disarm(); return; }
         if (isOn()) { disarm(); return; }
-        if (busy) return;
-        busy = true;
-        start().then(ok => { busy = false; if (ok) disarm(); });
-      }
-      function arm() {
-        UNLOCKING.forEach(ev => document.addEventListener(ev, onInteract, true));
-        BEST_EFFORT.forEach(ev => window.addEventListener(ev, onInteract, { capture: true, passive: true }));
-      }
-      function disarm() {
-        UNLOCKING.forEach(ev => document.removeEventListener(ev, onInteract, true));
-        BEST_EFFORT.forEach(ev => window.removeEventListener(ev, onInteract, true));
-      }
-
-      // الزر: تشغيل / كتم يدوي
-      btn.addEventListener('click', () => {
-        if (isOn()) {
-          remember(true); disarm(); stop();
-        } else {
-          remember(false); disarm(); start();
-        }
-      });
-
-      // إيقاف عند مغادرة التبويب واستئناف عند العودة
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          if (isOn()) { resumeAfterHidden = true; audio.pause(); setUI(false); }
-        } else if (resumeAfterHidden && !userMuted) {
-          resumeAfterHidden = false;
-          start().then(ok => { if (!ok) arm(); });
-        }
-      });
-
-      // البداية
-      if (!userMuted) {
-        start().then(ok => { if (!ok) arm(); });
-      }
-    })();
-  </script>
-</body>
-</html>
