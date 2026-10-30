@@ -51,7 +51,7 @@
       background:radial-gradient(ellipse at 80% 10%,rgba(41,182,255,.12),transparent 35%),radial-gradient(ellipse at 10% 35%,rgba(139,63,232,.15),transparent 32%);
     }
 
-    /* شريط علوي صغير لتضمين زر تبديل الوضع (داكن/فاتح) */
+    /* شريط علوي لتضمين زر تبديل الوضع (داكن/فاتح) */
     .top-controls {
       position: absolute; top: 15px; left: 15px; z-index: 50;
       display: flex; gap: 10px; align-items: center;
@@ -101,7 +101,7 @@
     .section-title.first-title { margin-top: 10px; }
     .section-sub { font-size: 0.78rem; color: var(--muted); margin-bottom: 10px; text-align: right; }
 
-    /* الأزرار والروابط */
+    /* الأزرار والروابط العامة */
     .links-container { display: flex; flex-direction: column; gap: 10px; }
     .link-btn {
       display: flex; align-items: center; justify-content: space-between;
@@ -110,8 +110,55 @@
       font-size: 0.9rem; font-weight: 600; transition: all 0.25s ease;
     }
     [data-theme="light"] .link-btn { background: rgba(241,245,249,0.8); }
-    .link-btn:hover { border-color: var(--cyan); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(41,182,255,0.15); color: var(--cyan); }
-    .link-btn i { font-size: 1.1rem; color: var(--cyan); }
+    .link-btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    .link-btn i { font-size: 1.1rem; }
+
+    /* تخصيص الألوان الشائعة لكل منصة وسائل تواصل وخدمة */
+    .link-btn.whatsapp { border-color: rgba(37, 211, 102, 0.4); }
+    .link-btn.whatsapp:hover { background: #25d366; color: #fff; border-color: #25d366; }
+    .link-btn.whatsapp i { color: #25d366; }
+    .link-btn.whatsapp:hover i { color: #fff; }
+
+    .link-btn.whatsapp-catalog { border-color: rgba(18, 140, 126, 0.4); }
+    .link-btn.whatsapp-catalog:hover { background: #128c7e; color: #fff; border-color: #128c7e; }
+    .link-btn.whatsapp-catalog i { color: #128c7e; }
+    .link-btn.whatsapp-catalog:hover i { color: #fff; }
+
+    .link-btn.instagram { border-color: rgba(225, 48, 108, 0.4); }
+    .link-btn.instagram:hover { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); color: #fff; border-color: transparent; }
+    .link-btn.instagram i { color: #e1306c; }
+    .link-btn.instagram:hover i { color: #fff; }
+
+    .link-btn.facebook { border-color: rgba(24, 119, 242, 0.4); }
+    .link-btn.facebook:hover { background: #1877f2; color: #fff; border-color: #1877f2; }
+    .link-btn.facebook i { color: #1877f2; }
+    .link-btn.facebook:hover i { color: #fff; }
+
+    .link-btn.tiktok { border-color: rgba(0, 0, 0, 0.4); }
+    [data-theme="dark"] .link-btn.tiktok { border-color: rgba(255, 255, 255, 0.3); }
+    .link-btn.tiktok:hover { background: #000000; color: #fff; border-color: #000000; }
+    .link-btn.tiktok i { color: var(--text); }
+    .link-btn.tiktok:hover i { color: #25F4EE; }
+
+    .link-btn.email { border-color: rgba(234, 67, 53, 0.4); }
+    .link-btn.email:hover { background: #ea4335; color: #fff; border-color: #ea4335; }
+    .link-btn.email i { color: #ea4335; }
+    .link-btn.email:hover i { color: #fff; }
+
+    .link-btn.service-btn { border-color: rgba(41, 182, 255, 0.4); }
+    .link-btn.service-btn:hover { background: var(--cyan); color: #000; border-color: var(--cyan); }
+    .link-btn.service-btn i { color: var(--cyan); }
+    .link-btn.service-btn:hover i { color: #000; }
+
+    .link-btn.team-btn { border-color: rgba(139, 63, 232, 0.4); }
+    .link-btn.team-btn:hover { background: var(--purple); color: #fff; border-color: var(--purple); }
+    .link-btn.team-btn i { color: var(--purple); }
+    .link-btn.team-btn:hover i { color: #fff; }
+
+    .link-btn.survey-btn { border-color: rgba(255, 152, 0, 0.4); }
+    .link-btn.survey-btn:hover { background: #ff9800; color: #000; border-color: #ff9800; }
+    .link-btn.survey-btn i { color: #ff9800; }
+    .link-btn.survey-btn:hover i { color: #000; }
 
     /* بطاقات الدفع والبيانات التجريبية */
     .payment-container { display: flex; flex-direction: column; gap: 10px; margin-top: 5px; }
