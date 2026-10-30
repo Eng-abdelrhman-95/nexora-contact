@@ -201,6 +201,7 @@
     .link-btn.instagram        { --glow: rgba(220, 39, 67, 0.55); }
     .link-btn.facebook         { --glow: rgba(24, 119, 242, 0.60); }
     .link-btn.tiktok           { --glow: rgba(254, 44, 85, 0.50); }
+    .link-btn.youtube          { --glow: rgba(255, 0, 0, 0.55); }
     .link-btn.email            { --glow: rgba(41, 182, 255, 0.55); }
 
     @media (hover: hover) {
@@ -213,6 +214,7 @@
     .link-btn.instagram:hover { background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%); border-color: transparent; color: #FFFFFF; }
     .link-btn.facebook:hover { background: #1877F2; border-color: #1877F2; color: #FFFFFF; }
     .link-btn.tiktok:hover { background: #000000; border-color: #FE2C55; box-shadow: -2px 2px 0px #25F4EE, 2px -2px 0px #FE2C55, 0 0 22px var(--glow); color: #FFFFFF; }
+    .link-btn.youtube:hover { background: #FF0000; border-color: #FF0000; color: #FFFFFF; }
     .link-btn.email:hover { background: linear-gradient(135deg, var(--cyan), var(--purple)); border-color: transparent; color: #FFFFFF; }
 
     .link-btn.service-btn:hover,
@@ -362,6 +364,11 @@
         <a href="https://www.tiktok.com/@nexorabs0" class="link-btn tiktok" target="_blank" rel="noopener">
           <span>TikTok | تيك توك</span>
           <i class="fab fa-tiktok"></i>
+        </a>
+
+        <a href="https://www.youtube.com/@Nexorabs0" class="link-btn youtube" target="_blank" rel="noopener">
+          <span>YouTube | يوتيوب</span>
+          <i class="fab fa-youtube"></i>
         </a>
 
         <a href="mailto:info.nexora.corp@gmail.com" class="link-btn email" target="_blank" rel="noopener">
@@ -680,10 +687,4 @@
         }
       });
 
-      if (!userMuted) {
-        start().then(ok => { if (!ok) arm(); });
-      }
-    })();
-  </script>
-</body>
-</html>
+      ... (باقي كود الجافاسكريبت إن وجد)
